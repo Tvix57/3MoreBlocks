@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Color, systemEvent, SystemEvent, SystemEventType, RigidBody2D, BoxCollider2D, Contact2DType, Vec2, random, Graphics } from 'cc';
+import { _decorator, Component, Node, Color, Sprite, systemEvent, SystemEvent, SystemEventType, RigidBody2D, BoxCollider2D, Contact2DType, Vec2, random, Graphics, UITransform, UI, SpriteFrame } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('block_sample_script')
@@ -8,25 +8,29 @@ export class block_sample_script extends Component {
     public height: number = 50;
     public widht: number = 50;
 
-    private rigidbody: any;
-    private walk_force: number = 0.1;
+    private rigidbody: RigidBody2D;
 
     init() {
         const colors = [Color.RED, Color.GREEN, Color.BLUE];
         this.color = colors[Math.floor(Math.random() * colors.length)];
-
-        const graphicsComponent = this.node.addComponent(Graphics);
-        graphicsComponent.rect(0, 0, this.height, this.widht);
-        graphicsComponent.fillColor = this.color;
+        
+        const graphis = this.node.addComponent(Graphics);
+        graphis.fillColor = this.color;
+        graphis.lineWidth = 0;
+        graphis.rect(0, 0, this.height, this.widht);
+        graphis.fill();
+   
+        const trans = this.node.getComponent(UITransform);
+        trans.setContentSize(this.height, this.widht);
+        trans.setAnchorPoint(0, 0);
+        const collider = this.node.addComponent(BoxCollider2D);
+        collider.size.height = this.height;
+        collider.size.width = this.widht;
 
        // systemEvent.on(SystemEventType.MOUSE_UP, this.onClickEvent, this);
 
         this.rigidbody = this.node.addComponent(RigidBody2D);
-    }
-
-    update(deltaTime: number) {
-    
-       // this.rigidbody.applyForceCenter(new Vec2(0, -1 * this.walk_force), true); // error
+        this.rigidbody.fixedRotation = true;
     }
 
     onClickEvent() {

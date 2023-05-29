@@ -2,10 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\3MoreBlocks",
-    "\\3MoreBlocks\\.creator\\asset-template",
-    "\\3MoreBlocks\\.creator\\asset-template\\typescript",
+    "\\3MoreBlocks\\assets",
     "\\3MoreBlocks\\assets\\scripts"
   ],
-  "SelectedNode": "\\3MoreBlocks\\assets",
+  "SelectedNode": "\\3MoreBlocks\\assets\\scripts\\block_sample_script.ts",
   "PreviewInSolutionExplorer": false
 }
