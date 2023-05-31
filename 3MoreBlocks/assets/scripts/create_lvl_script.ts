@@ -20,7 +20,6 @@ export class create_lvl extends Component {
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 var newNode = new Node;
-                
                 const component = newNode.addComponent(block_sample_script);
                 component.height = on_disp_height;
                 component.widht = on_disp_widht;

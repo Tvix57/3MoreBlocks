@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Color, Sprite, SystemEvent, SystemEventType,  RigidBody2D,  BoxCollider2D, Contact2DType, Vec2, random, Graphics, UITransform, UI, SpriteFrame, RigidBody, BoxCollider, director } from 'cc';
+import { _decorator, Component, geometry, PhysicsSystem, Node, Color, Sprite, math, SystemEvent, SystemEventType,  RigidBody2D,  BoxCollider2D, Contact2DType, Vec2, random, Graphics, UITransform, UI, SpriteFrame, RigidBody, BoxCollider, director, Director, Layout, Vec3, Line, PhysicsSystem2D, nextPow2 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('block_sample_script')
@@ -33,7 +33,7 @@ export class block_sample_script extends Component {
         this.rigidbody.type = 3;
         this.rigidbody.fixedRotation = true;
 
-        // systemEvent.on(SystemEventType.MOUSE_UP, this.onClickEvent, this);
+        this.node.on(Node.EventType.MOUSE_UP, this.onClickEvent, this);
     }
 
     update(deltaTime: number) {
@@ -43,6 +43,7 @@ export class block_sample_script extends Component {
     onClickEvent() {
         let list: Node[] = [];
         this.findNeighbours(list, this.color);
+        console.log("test");
         if (list.length > 2) {
             list.forEach((child) => {
                 child.destroy();
@@ -51,27 +52,31 @@ export class block_sample_script extends Component {
     }
 
     findNeighbours(list: Node[], start_color: Color) {
-
         let closest_neighbour: Node[] = [];
         
-        const sense = this.node.addComponent(BoxCollider2D)
-        sense.size.x = this.widht * 1.5;
-        sense.size.y = 0;
+        const worldPos = this.node.getWorldPosition();
         
-        closest_neighbour.push(new Node);
-        closest_neighbour.push(new Node);
-
-        sense.size.x = 0;
-        sense.size.y = this.height * 1.5;
-        
-        closest_neighbour.push(new Node);
-        closest_neighbour.push(new Node);
-        
-        this.node.removeComponent(sense);
-
+        const ray = new geometry.Ray(worldPos.x, worldPos.y, worldPos.z, worldPos.x, worldPos.y, worldPos.z);
+        const mask = 0xffffffff;
+        const maxDistance = this.height;
+        const queryTriger = true;
+        for (let i = 1; i < 3; i++) {
+            for (let j = 1; j < 3; j++) {
+                ray.d.x = worldPos.x + (this.widht * Math.pow(-1, i));
+                ray.d.y = worldPos.y + (this.height * Math.pow(-1, j));
+                if (PhysicsSystem.instance.raycast(ray, mask, maxDistance, queryTriger)) {
+                    const result = PhysicsSystem.instance.raycastResults;
+                    result.forEach((iter) => {
+                        const node_component = iter.collider.node.getComponent(block_sample_script);
+                        if (node_component && node_component.color == start_color) {
+                            closest_neighbour.push(iter.collider.node);
+                        }
+                    });
+                }
+            }
+        }
         closest_neighbour.forEach((child) => {
-            const component = child.getComponent(block_sample_script);
-            if (component.color == start_color && list.indexOf(child) === -1) {
+            if (list.indexOf(child) === -1) {
                 list.push(child);
                 child.getComponent(block_sample_script).findNeighbours(list, start_color);
             }
